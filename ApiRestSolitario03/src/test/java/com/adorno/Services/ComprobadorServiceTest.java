@@ -26,8 +26,9 @@ class ComprobadorServiceTest {
 	@Test
 	void testIsMayorEdad() {
 		when(personaService.getByDNI("1")).thenReturn(Optional.of(new Persona("1","Luis",12)));
-		Optional<Persona> humano=personaService.getByDNI("1");
+		when(personaService.getByDNI("2")).thenReturn(Optional.of(new Persona("1","Luis",25)));
 		assertFalse(comprobadorServiceImpl.isMayorEdad("1"));
+		assertTrue(comprobadorServiceImpl.isMayorEdad("2"));
 	}
 
 }
