@@ -19,6 +19,15 @@ public class Persona {
 		this.edad = edad;
 		this.color = color;
 	}
+	
+
+	public Persona(int id, String nombre, int edad, String color) {
+		super();
+		this.id = id;
+		this.nombre = nombre;
+		this.edad = edad;
+		this.color = color;
+	}
 
 	public Persona() {
 		super();
