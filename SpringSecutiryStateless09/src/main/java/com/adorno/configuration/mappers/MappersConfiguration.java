@@ -1,4 +1,4 @@
-package com.adorno.configuration;
+package com.adorno.configuration.mappers;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
