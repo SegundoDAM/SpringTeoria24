@@ -45,7 +45,7 @@ public class SecurityConfig {
 		String password = passwordEncoder().encode("1234");
 		UserDetails user = User.withUsername("jose").password(password).roles().build();
 		manager.createUser(user);
-//		System.out.println("SecurityConfig: "+user.getPassword());
+		log.debug("SecurityConfig: "+user.getPassword());
 		return manager;
 	}
 
