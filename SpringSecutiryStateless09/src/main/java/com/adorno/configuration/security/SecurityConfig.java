@@ -10,11 +10,15 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Configuration
+@Slf4j
 public class SecurityConfig {
 
 	@Bean
@@ -38,8 +42,10 @@ public class SecurityConfig {
 	@Bean
 	UserDetailsService userDetailsService() {
 		InMemoryUserDetailsManager manager = new InMemoryUserDetailsManager();
-		UserDetails user = User.withUsername("jose").password("1234").roles().build();
+		String password = passwordEncoder().encode("1234");
+		UserDetails user = User.withUsername("jose").password(password).roles().build();
 		manager.createUser(user);
+//		System.out.println("SecurityConfig: "+user.getPassword());
 		return manager;
 	}
 
@@ -48,7 +54,7 @@ public class SecurityConfig {
 	 */
 	@Bean
 	PasswordEncoder passwordEncoder() {
-		return PlainTextPasswordEncoder.getInstance();
+		return new BCryptPasswordEncoder();
 	}
 
 	/*
