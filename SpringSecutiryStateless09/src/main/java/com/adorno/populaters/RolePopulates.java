@@ -14,12 +14,14 @@ import jakarta.annotation.PostConstruct;
 @Component
 public class RolePopulates {
 	private final RoleRepository roleRepository;
+	private final UserService userService;
 	@Value("${spring.jpa.hibernate.ddl-auto}")
 	private String bbddStatus;
 
 	public RolePopulates(RoleRepository roleRepository, UserService userService) {
 		super();
 		this.roleRepository = roleRepository;
+		this.userService = userService;
 	}
 
 	//debido al orden en que se cargan las clases de Spring
@@ -28,6 +30,7 @@ public class RolePopulates {
 	public void init() {
 		if (!bbddStatus.equals("update")) {
 			populateRoles();
+			populateUsers();
 		}
 	}
 	public void populateRoles() {
@@ -35,5 +38,9 @@ public class RolePopulates {
 			if (roleRepository.findByName(erole).isEmpty())
 				roleRepository.save(new RoleEntity(erole));
 		}
+	}
+	public void populateUsers() {
+		UserCreateDTO userCreateDTO = new UserCreateDTO("duque@dolor.es", "cayetano", "1234", "ADMIN","USER");
+		userService.createUser(userCreateDTO);
 	}
 }
