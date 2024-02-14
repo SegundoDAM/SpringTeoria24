@@ -1,6 +1,7 @@
 package com.adorno.populaters;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import com.adorno.model.ERole;
@@ -40,7 +41,7 @@ public class RolePopulates {
 		}
 	}
 	public void populateUsers() {
-		UserCreateDTO userCreateDTO = new UserCreateDTO("duque@dolor.es", "cayetano", "1234", "ADMIN","USER");
+		UserCreateDTO userCreateDTO = new UserCreateDTO("duque@dolor.es", "cayetano", new BCryptPasswordEncoder().encode("1234"), "ADMIN","USER");
 		userService.createUser(userCreateDTO);
 	}
 }

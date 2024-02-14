@@ -40,6 +40,10 @@ public class UserEntity {
 //	@Pattern(regexp = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)[A-Za-z\\d;,\\.]{8,}$", message = "Debe tener al menos 8 caracteres, contener al menos una mayúscula, una minúscula, un número y un símbolo entre coma, punto y coma, o punto")
 	private String password;
 
+
+	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
+	private Set<RoleEntity> roles;
+	
 	public UserEntity(String email, String username, String password) {
 		super();
 		this.email = email;
@@ -47,6 +51,4 @@ public class UserEntity {
 		this.password = password;
 	}
 
-	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
-	private Set<RoleEntity> roles;
 }

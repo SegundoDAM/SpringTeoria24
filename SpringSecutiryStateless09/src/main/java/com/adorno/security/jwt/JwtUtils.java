@@ -31,7 +31,8 @@ public class JwtUtils {
 				// la parte publica
 				.issuedAt(Date.valueOf(LocalDate.now().plus(1, ChronoUnit.DAYS))).subject(username)
 				// la parte secreta
-				.signWith(getSignatureKey()).compact();
+				.signWith(getSignatureKey())
+				.compact();
 		log.debug("JwtUtils: creandotoken " + compact);
 		return compact;
 
