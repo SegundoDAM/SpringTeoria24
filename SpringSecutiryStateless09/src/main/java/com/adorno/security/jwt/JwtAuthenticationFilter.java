@@ -36,6 +36,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 		UserEntity userEntity;
 		String username;
 		String password;
+		log.debug("JwtAuthenticationFilter:intento authenticate");
 		try {
 			userEntity = new ObjectMapper().readValue(request.getInputStream(), UserEntity.class);
 			username = userEntity.getUsername();
@@ -45,6 +46,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 					password);
 			Authentication authenticate = getAuthenticationManager().authenticate(authenticationToken);
 			log.debug("JwtAuthenticationFilter:terminado intento authenticate");
+			
 			return authenticate;
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -115,6 +117,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 			AuthenticationException failed) throws IOException, ServletException {
 		// TODO Auto-generated method stub
 		super.unsuccessfulAuthentication(request, response, failed);
+		System.out.println("JwtAuthenticationFilter:fallo autenticado");
 	}
 
 }

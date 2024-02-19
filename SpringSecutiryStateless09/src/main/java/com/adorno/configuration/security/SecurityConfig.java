@@ -22,7 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 public class SecurityConfig {
 	private final UserDetailsServiceImpl userDetailsServiceImpl;
 	private final JwtUtils jwtUtils;
-	
+
 	public SecurityConfig(UserDetailsServiceImpl userDetailsServiceImpl, JwtUtils jwtUtils) {
 		super();
 		this.userDetailsServiceImpl = userDetailsServiceImpl;
@@ -30,23 +30,20 @@ public class SecurityConfig {
 	}
 
 	@Bean
-	SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity,AuthenticationManager authenticationManager) throws Exception {
-		//aqui vamos a poner la autenticacion de jwt
-		JwtAuthenticationFilter jwtAuthenticationFilter=new JwtAuthenticationFilter(jwtUtils);
+	SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity, AuthenticationManager authenticationManager)
+			throws Exception {
+		// aqui vamos a poner la autenticacion de jwt
+		JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(jwtUtils);
 		jwtAuthenticationFilter.setAuthenticationManager(authenticationManager);
 		jwtAuthenticationFilter.setFilterProcessesUrl("/login");
-		//aqui el resto de la autenticacion
-		DefaultSecurityFilterChain httpsec=httpSecurity
-		.csrf((cs) -> cs.disable())
-		.authorizeHttpRequests((auth) -> {
-				auth.requestMatchers("users/hello").permitAll();
-				auth.anyRequest().authenticated();
-			})
-		.sessionManagement((sess) -> {
-				sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-			})
-		.addFilter(jwtAuthenticationFilter)
-		.build();
+		// aqui el resto de la autenticacion
+		DefaultSecurityFilterChain httpsec = httpSecurity.csrf((cs) -> cs.disable()).authorizeHttpRequests((auth) -> {
+			auth.requestMatchers("users/hello").permitAll();
+			auth.anyRequest().authenticated();
+		}).sessionManagement((sess) -> {
+			sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+		}).addFilter(jwtAuthenticationFilter).build();
+		log.debug("SecurityConfig:terminando configuracion config");
 		return httpsec;
 	}
 
@@ -66,11 +63,9 @@ public class SecurityConfig {
 	@Bean
 	AuthenticationManager authenticationManager(HttpSecurity httpSecurity, PasswordEncoder passwordEncoder)
 			throws Exception {
-		return httpSecurity
-				.getSharedObject(AuthenticationManagerBuilder.class)
-				.userDetailsService(userDetailsServiceImpl)
-				.passwordEncoder(passwordEncoder)
-				.and()
-				.build();
+		AuthenticationManager authenticationManager = httpSecurity.getSharedObject(AuthenticationManagerBuilder.class)
+				.userDetailsService(userDetailsServiceImpl).passwordEncoder(passwordEncoder).and().build();
+		log.debug("SecurityConfig:generando autentication manager");
+		return authenticationManager;
 	}
 }
