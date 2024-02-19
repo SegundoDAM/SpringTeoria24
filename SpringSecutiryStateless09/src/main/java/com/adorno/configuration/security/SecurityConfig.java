@@ -4,29 +4,36 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.DefaultSecurityFilterChain;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import com.adorno.security.jwt.JwtAuthenticationFilter;
 import com.adorno.security.jwt.JwtUtils;
+import com.adorno.security.jwt.filters.JwtAuthenticationFilter;
+import com.adorno.security.jwt.filters.JwtAuthorizationFilter;
 import com.adorno.services.UserDetailsServiceImpl;
 
 import lombok.extern.slf4j.Slf4j;
 
 @Configuration
 @Slf4j
+@EnableMethodSecurity
 public class SecurityConfig {
 	private final UserDetailsServiceImpl userDetailsServiceImpl;
 	private final JwtUtils jwtUtils;
+	private final JwtAuthorizationFilter jwtAuthorizationFilter;
 
-	public SecurityConfig(UserDetailsServiceImpl userDetailsServiceImpl, JwtUtils jwtUtils) {
+	public SecurityConfig(UserDetailsServiceImpl userDetailsServiceImpl, JwtUtils jwtUtils,
+			JwtAuthorizationFilter jwtAuthorizationFilter) {
 		super();
 		this.userDetailsServiceImpl = userDetailsServiceImpl;
 		this.jwtUtils = jwtUtils;
+		this.jwtAuthorizationFilter = jwtAuthorizationFilter;
 	}
 
 	@Bean
@@ -37,13 +44,21 @@ public class SecurityConfig {
 		jwtAuthenticationFilter.setAuthenticationManager(authenticationManager);
 		jwtAuthenticationFilter.setFilterProcessesUrl("/login");
 		// aqui el resto de la autenticacion
-		DefaultSecurityFilterChain httpsec = httpSecurity.csrf((cs) -> cs.disable()).authorizeHttpRequests((auth) -> {
-			auth.requestMatchers("users/hello").permitAll();
-			auth.anyRequest().authenticated();
-		}).sessionManagement((sess) -> {
-			sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-		}).addFilter(jwtAuthenticationFilter).build();
-		log.debug("SecurityConfig:terminando configuracion config");
+		DefaultSecurityFilterChain httpsec = 
+				httpSecurity
+				.csrf((cs) -> cs.disable())
+				.authorizeHttpRequests((auth) -> {
+						auth.requestMatchers("users/hello").permitAll();
+//						auth.requestMatchers("users/helloSecured").hasAnyRole("ADMIN");
+						auth.anyRequest().authenticated();
+						})
+				.sessionManagement((sess) -> {
+						sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+						})
+				.addFilter(jwtAuthenticationFilter)
+				.addFilterBefore(jwtAuthorizationFilter, UsernamePasswordAuthenticationFilter.class)
+				.build();
+		log.info("SecurityConfig:terminando configuracion config");
 		return httpsec;
 	}
 

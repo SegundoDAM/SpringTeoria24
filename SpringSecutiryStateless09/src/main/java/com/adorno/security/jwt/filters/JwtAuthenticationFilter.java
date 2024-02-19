@@ -1,4 +1,4 @@
-package com.adorno.security.jwt;
+package com.adorno.security.jwt.filters;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -13,6 +13,7 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import com.adorno.model.UserEntity;
+import com.adorno.security.jwt.JwtUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.servlet.FilterChain;
@@ -36,7 +37,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 		UserEntity userEntity;
 		String username;
 		String password;
-		log.debug("JwtAuthenticationFilter:intento authenticate");
+		System.out.println("JwtAuthenticationFilter:intento authenticate");
 		try {
 			userEntity = new ObjectMapper().readValue(request.getInputStream(), UserEntity.class);
 			username = userEntity.getUsername();
@@ -45,7 +46,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 			UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(username,
 					password);
 			Authentication authenticate = getAuthenticationManager().authenticate(authenticationToken);
-			log.debug("JwtAuthenticationFilter:terminado intento authenticate");
+			System.out.println("JwtAuthenticationFilter:terminado intento authenticate");
 			
 			return authenticate;
 		} catch (Exception e) {
@@ -109,7 +110,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 		 * cliente
 		 */
 		super.successfulAuthentication(request, response, chain, authResult);
-		log.debug("JwtAuthenticationFilter:usuario autenticado");
+		System.out.println("JwtAuthenticationFilter:usuario autenticado");
 	}
 
 	@Override
