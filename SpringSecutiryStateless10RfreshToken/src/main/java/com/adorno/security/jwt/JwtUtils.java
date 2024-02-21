@@ -2,12 +2,15 @@ package com.adorno.security.jwt;
 
 import java.sql.Date;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.function.Function;
 
 import javax.crypto.SecretKey;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
 
 import io.jsonwebtoken.Claims;
@@ -31,12 +34,21 @@ public class JwtUtils {
 				// la parte publica
 				.issuedAt(Date.valueOf(LocalDate.now().plus(1, ChronoUnit.DAYS)))
 				.subject(username)
+				//caducando
+				.expiration(Date.from(LocalDateTime.now().plusSeconds(30).atZone(ZoneId.systemDefault()).toInstant()))
 				// la parte secreta
 				.signWith(getSignatureKey())
 				.compact();
 		log.debug("JwtUtils: creandotoken " + compact);
 		return compact;
 
+	}
+	public String generateRefreshToken(User user) {
+		return Jwts.builder()
+				.subject(user.getUsername())
+				.issuedAt(Date.valueOf(LocalDate.now()))
+				.signWith(getSignatureKey())
+				.compact();
 	}
 
 	public Boolean isTokenValid(String token) {
@@ -53,18 +65,7 @@ public class JwtUtils {
 		return getClaim(token, Claims::getSubject);
 	}
 
-	private SecretKey getSignatureKey() {
-		/*
-		 * Aquí se está utilizando la clase Keys del paquete javax.crypto.spec para
-		 * generar una clave HMAC-SHA utilizando la secretKey. La secretKey se
-		 * decodifica de Base64 usando Decoders.BASE64.decode(secretKey), que se espera
-		 * que sea una cadena codificada en Base64 que representa la clave secreta.
-		 * 
-		 * En resumen, este método getSignatureKey() genera una clave para firmar
-		 * utilizando HMAC-SHA a partir de una clave secreta codificada en Base64
-		 * llamada secretKey. //aqui vamos a crear la firma sha de la secretKey observa
-		 * como se decodifica la secretkey
-		 */
+	public SecretKey getSignatureKey() {
 		return Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKey));
 	}
 
